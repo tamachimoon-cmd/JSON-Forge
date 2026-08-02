@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {createServer} from '../server.js';
+async function run(fn){const server=createServer();await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));try{await fn(`http://127.0.0.1:${server.address().port}`)}finally{await new Promise(resolve=>server.close(resolve))}}
+test('health responde',()=>run(async base=>{const response=await fetch(`${base}/api/health`);assert.equal(response.status,200)}));
+test('gera JSON pela API',()=>run(async base=>{const response=await fetch(`${base}/api/generate`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({schema:[{name:'id',type:'id'}],count:2})});const data=await response.json();assert.equal(response.status,201);assert.equal(data.records.length,2)}))
